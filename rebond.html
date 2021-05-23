@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Effet de rebond en mouvement avec jQuery</title>
+<link href="rebond.css" rel="stylesheet" type="text/css"/>
+<script type="application/javascript" src="jquery-1.11.3.min.js"></script>
+<script type="application/javascript">
+$(document).ready(function() {
+	function rebondsAutomatiques() {
+		
+		var z = $('#zoneAuto'); // Zone
+		var el = $('#rebondAuto'); // top
+		
+		
+		var hauteurElement = el.height();
+		var largeurElement = el.width();
+		
+		
+		var hauteurZone = z.outerHeight();
+		var largeurZone = z.outerWidth();
+		
+		
+		var bordureZone = 3;
+		
+		
+		var pixelHaut = z.offset().top;
+		var pixelGauche = z.offset().left;
+		var pixelBas = (pixelHaut + hauteurZone) - (hauteurElement + bordureZone);
+		var pixelDroite = (pixelGauche + largeurZone) - (largeurElement + bordureZone);
+		
+		
+		var orientationX = 0.3; 
+		var orientationY = 0.3; 
+		var timing = 1000/150; 
+		
+		
+		var boucle = setInterval(function() {
+			
+			var offsetHaut = el.offset().top;
+			var offsetGauche = el.offset().left;
+			var offsetBas = offsetHaut + hauteurElement;
+			var offsetDroite = offsetGauche + largeurElement;
+			
+			
+			if(parseInt(offsetGauche) >= pixelDroite+1 || parseInt(offsetGauche) <= pixelGauche+1) {
+				orientationX *= -1;
+			}
+			
+			if(parseInt(offsetHaut) >= pixelBas+1 || parseInt(offsetHaut) <= pixelHaut+1) {
+				orientationY *= -1;
+			}
+			
+			
+			position = el.offset({
+				left:offsetGauche + orientationX,
+				top:offsetHaut + orientationY
+			});
+		}, timing);
+	}
+
+	function rebondsManuels() {
+		
+		var z = $('#zone'); 
+		var el = $('#rebond'); 
+		
+		
+		var hauteurElement = el.height();//yukseklik
+		var largeurElement = el.width();//genislik
+		
+		
+		var hauteurZone = z.innerHeight();
+		var largeurZone = z.innerWidth();
+		
+		
+		var bordureZone = 3;
+		
+		
+		var pixelHaut = z.offset().top + bordureZone;//ust
+		var pixelGauche = z.offset().left + bordureZone;//sol
+		var pixelBas = pixelHaut + hauteurZone - bordureZone;//alt
+		var pixelDroite = pixelGauche + largeurZone - bordureZone;//sag
+		
+		
+		var orientationX = 3; 
+		var orientationY = 3; 
+		deplacementX = 0; //yon
+		deplacementY = 0; //yon
+		var timing = 1000/25000; 
+		
+		
+		var keys = {}
+		$(document).keydown(function(e) {
+			keys[e.keyCode] = true;
+		});
+		$(document).keyup(function(e) {
+			delete keys[e.keyCode];
+		});
+
+		// Hareket icin
+		$(document).keydown(function(ev) {
+			
+			var offsetHaut = el.offset().top;
+			var offsetGauche = el.offset().left;
+			var offsetBas = offsetHaut + hauteurElement;
+			var offsetDroite = offsetGauche + largeurElement;
+
+			for(var direction in keys) {
+				// Sag tus
+				if(direction == 39) {
+					if(offsetDroite >= pixelDroite) {
+						var deplacementX = orientationX * 0;
+					} else {
+						var deplacementX = orientationX * 1;
+					}
+				}
+				// Sol tus
+				if(direction == 37) {
+					if(offsetGauche <= pixelGauche) {
+						var deplacementX = orientationX * 0;
+					} else {
+						var deplacementX = orientationX * -1;
+					}
+				}
+				// Ust tus
+				if(direction == 38) {
+					
+					if(offsetHaut <= pixelHaut) {
+						var deplacementY = orientationY * 0;
+					} else {
+						var deplacementY = orientationY * -1;
+					}
+				}
+				// Alt tus
+				if(direction == 40) {
+					
+					if(offsetBas >= pixelBas) {
+						var deplacementY = orientationY * 0;
+					} else {
+						var deplacementY = orientationY * 1;
+					}
+				}
+			}
+
+			position = el.offset({
+				left:offsetGauche + deplacementX,
+				top:offsetHaut + deplacementY
+			});
+		});
+	}
+// On lance les fonctions
+rebondsAutomatiques();
+rebondsManuels();
+});
+</script>
+</head>
+
+<body>
+<div id="zoneAuto">
+	<div id="rebondAuto"></div>
+</div>
+
+<div id="zone">
+	<div id="rebond"></div>
+</div>
+</body>
+</html>
